@@ -8,11 +8,11 @@
   "brandMarkText": "GM - Nutrizione e benessere",
   "brandMarkImage": "",
   "icons": {
-    "Colazione": "icons/pasti/colazione.png",
-    "Pranzo": "icons/pasti/pranzo.png",
-    "Cena": "icons/pasti/cena.png",
-    "Spuntino mattina": "icons/pasti/spuntino-mattina.png",
-    "Spuntino pomeriggio": "icons/pasti/spuntino-pomeriggio.png"
+    "Colazione": "https://drive.google.com/file/d/13rKTv93xIKLvmqhB3PUIer2z9k99VB5E/view?usp=drive_link",
+    "Pranzo": "https://drive.google.com/file/d/13PTBpgk3W_VDOCd1HYHI1t4tRKbnE6Dc/view?usp=drive_link",
+    "Cena": "https://drive.google.com/file/d/1xxNDXn4pGolC-CTKD1XDhb6AH2FutJmP/view?usp=drive_link",
+    "Spuntino mattina": "https://drive.google.com/file/d/1fa2wuinDmARUiMM2asidNupODZi_qwJe/view?usp=drive_link",
+    "Spuntino pomeriggio": "https://drive.google.com/file/d/1_V1a1siHKkaauQnZwQWBHb3KfSyM4aS8/view?usp=drive_link"
   },
   "categoryLabels": {
     "Colazione": "Colazione",
