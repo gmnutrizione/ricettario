@@ -1,0 +1,25 @@
+/* ============================================================
+   PERSONALIZZAZIONE ASPETTO
+   File generato con personalizza.html — sostituisci il vecchio
+   theme.css nella cartella del sito con questo file, poi ripubblica
+   su Netlify trascinando di nuovo l'intera cartella.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --paper: #fffcf0;
+  --ink: #2f491d;
+  --honey: #000000;
+  --honey-deep: #000000;
+  --tomato: #a52d12;
+  --sage: #2f491d;
+  --radius: 18px;
+  --tilt-mult: 0;
+  --card-direction: row;
+  --spuntini-cols: 2;
+  --scale-heading: 1.05;
+  --scale-body: 1.05;
+  --brandmark-color: #fffcf0;
+  --font-display: "Lora", serif;
+  --font-body: "Open Sans", sans-serif;
+}

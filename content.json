@@ -1,0 +1,24 @@
+{
+  "siteTitle": "Ricettario",
+  "headline": " ",
+  "eyebrow": "Cosa cucini oggi?",
+  "sectionMain": "Pasti principali",
+  "sectionSnack": "Spuntini",
+  "emptyState": "Non ci sono ancora ricette in questa categoria.\nTorneranno presto nuove idee!",
+  "brandMarkText": "GM - Nutrizione e benessere",
+  "brandMarkImage": "",
+  "icons": {
+    "Colazione": "icons/pasti/colazione.png",
+    "Pranzo": "icons/pasti/pranzo.png",
+    "Cena": "icons/pasti/cena.png",
+    "Spuntino mattina": "icons/pasti/spuntino-mattina.png",
+    "Spuntino pomeriggio": "icons/pasti/spuntino-pomeriggio.png"
+  },
+  "categoryLabels": {
+    "Colazione": "Colazione",
+    "Pranzo": "Pranzo - Primi piatti",
+    "Cena": "Cena - Secondo piatto",
+    "Spuntino mattina": "Spuntino mattina",
+    "Spuntino pomeriggio": "Spuntino pomeriggio"
+  }
+}

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personalizza il ricettario</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  html, body { height: 100%; margin: 0; }
+  body { background: #EDE7D6; }
+  .editor {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    height: 100vh;
+    height: 100dvh;
+    max-width: none;
+    overflow: hidden;
+  }
+  @media (max-width: 860px) {
+    .editor { grid-template-columns: 1fr; height: auto; overflow: visible; }
+  }
+  .panel {
+    background: #fff;
+    padding: 24px;
+    border-right: 1px solid rgba(43,46,34,0.12);
+    overflow-y: auto;
+    height: 100%;
+    font-family: "Work Sans", sans-serif;
+  }
+  @media (max-width: 860px) {
+    .panel { height: auto; overflow-y: visible; }
+  }
+  .panel h1 {
+    font-family: "Fraunces", serif;
+    font-size: 22px;
+    margin: 0 0 4px 0;
+  }
+  .panel .sub {
+    font-size: 13px;
+    color: #6b6f5c;
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+  }
+  .field-group {
+    margin-bottom: 22px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid rgba(43,46,34,0.1);
+  }
+  .field-group:last-of-type { border-bottom: none; }
+  .field-group h2 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8a8e73;
+    margin: 0 0 12px 0;
+  }
+  .color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .color-row label { flex: 1; font-size: 14px; }
+  .color-row input[type="color"] {
+    width: 40px; height: 32px;
+    border: 1px solid rgba(43,46,34,0.2);
+    border-radius: 6px;
+    padding: 0;
+    cursor: pointer;
+    background: none;
+  }
+  .color-row input[type="text"] {
+    width: 84px;
+    font-family: monospace;
+    font-size: 13px;
+    padding: 5px 6px;
+    border: 1px solid rgba(43,46,34,0.25);
+    border-radius: 6px;
+  }
+  .font-field { margin-bottom: 14px; }
+  .font-field label { display: block; font-size: 14px; margin-bottom: 5px; }
+  .font-field .row { display: flex; gap: 8px; }
+  .font-field input[type="text"] {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid rgba(43,46,34,0.25);
+    border-radius: 6px;
+  }
+  .font-field select {
+    padding: 8px 6px;
+    border-radius: 6px;
+    border: 1px solid rgba(43,46,34,0.25);
+    font-size: 13px;
+  }
+  .font-hint { font-size: 12px; color: #8a8e73; margin-top: 4px; }
+  .simple-field { margin-bottom: 14px; }
+  .simple-field label { display: block; font-size: 14px; margin-bottom: 5px; }
+  .simple-field input[type="text"], .simple-field textarea {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid rgba(43,46,34,0.25);
+    border-radius: 6px;
+    font-family: "Work Sans", sans-serif;
+    resize: vertical;
+  }
+  .choice-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .choice-row button {
+    flex: 1;
+    min-width: 120px;
+    padding: 9px 10px;
+    font-size: 13px;
+    border: 1.5px solid rgba(43,46,34,0.2);
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    font-family: "Work Sans", sans-serif;
+  }
+  .choice-row button.active {
+    border-color: #D98F1F;
+    background: #FCF3E3;
+    font-weight: 600;
+  }
+  .choice-label { font-size: 14px; margin-bottom: 8px; display: block; }
+  .download-btn {
+    width: 100%;
+    padding: 14px;
+    background: #2B2E22;
+    color: #F6F1E3;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: "Work Sans", sans-serif;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .download-btn:hover { background: #40443240; opacity: 0.92; }
+  .reset-btn {
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: none;
+    color: #8a8e73;
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 10px;
+    font-family: "Work Sans", sans-serif;
+  }
+  .preview-wrap {
+    padding: 40px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: 100%;
+    overflow-y: auto;
+  }
+  @media (max-width: 860px) {
+    .preview-wrap { height: auto; overflow-y: visible; }
+  }
+  .preview-frame {
+    width: 380px;
+    flex-shrink: 0;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    background: var(--paper);
+  }
+  .save-note {
+    background: #FCF3E3;
+    border: 1px solid #EBD8AE;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: #6b5a20;
+    margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+
+<div class="editor">
+  <div class="panel">
+    <h1>Personalizza il ricettario</h1>
+    <p class="sub">Cambia colori, font e disposizione. L'anteprima a destra si aggiorna subito. Quando ti piace, scarica il file in fondo alla pagina.</p>
+
+    <div class="field-group">
+      <h2>Colori</h2>
+      <div class="color-row">
+        <label>Sfondo pagina</label>
+        <input type="color" id="c-paper" value="#F6F1E3">
+        <input type="text" id="t-paper" value="#F6F1E3">
+      </div>
+      <div class="color-row">
+        <label>Intestazione e card</label>
+        <input type="color" id="c-ink" value="#2B2E22">
+        <input type="text" id="t-ink" value="#2B2E22">
+      </div>
+      <div class="color-row">
+        <label>Accento (icone)</label>
+        <input type="color" id="c-honey" value="#D98F1F">
+        <input type="text" id="t-honey" value="#D98F1F">
+      </div>
+      <div class="color-row">
+        <label>Numeri procedimento</label>
+        <input type="color" id="c-tomato" value="#B5432A">
+        <input type="text" id="t-tomato" value="#B5432A">
+      </div>
+      <div class="color-row">
+        <label>Spunte ingredienti</label>
+        <input type="color" id="c-sage" value="#52713D">
+        <input type="text" id="t-sage" value="#52713D">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <h2>Caratteri</h2>
+      <div class="font-field">
+        <label>Font dei titoli</label>
+        <div class="row">
+          <input type="text" id="font-display" value="Fraunces" list="font-suggestions">
+          <select id="font-display-fallback">
+            <option value="serif">Con grazie</option>
+            <option value="sans-serif">Senza grazie</option>
+          </select>
+        </div>
+      </div>
+      <div class="font-field">
+        <label>Font del testo</label>
+        <div class="row">
+          <input type="text" id="font-body" value="Work Sans" list="font-suggestions">
+          <select id="font-body-fallback">
+            <option value="sans-serif" selected>Senza grazie</option>
+            <option value="serif">Con grazie</option>
+          </select>
+        </div>
+      </div>
+      <datalist id="font-suggestions">
+        <option value="Fraunces"><option value="Playfair Display"><option value="DM Serif Display">
+        <option value="Work Sans"><option value="Inter"><option value="Space Grotesk">
+        <option value="Poppins"><option value="Lato"><option value="Nunito"><option value="Sora">
+      </datalist>
+      <p class="font-hint">Scrivi il nome esatto di un font da fonts.google.com — si carica in automatico.</p>
+    </div>
+
+    <div class="field-group">
+      <h2>Forma delle card</h2>
+      <span class="choice-label">Bordi</span>
+      <div class="choice-row" data-group="radius">
+        <button data-value="18px" class="active">Arrotondati</button>
+        <button data-value="6px">Squadrati</button>
+      </div>
+      <span class="choice-label">Inclinazione</span>
+      <div class="choice-row" data-group="tilt">
+        <button data-value="1" class="active">Con movimento</button>
+        <button data-value="0">Tutte dritte</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <h2>Dimensione dei testi</h2>
+      <div class="simple-field">
+        <label>Titoli (nomi ricette, intestazioni) — <span id="scaleHeadingValue">100%</span></label>
+        <input type="range" id="scale-heading" min="0.85" max="1.4" step="0.05" value="1" style="width:100%;">
+      </div>
+      <div class="simple-field">
+        <label>Testo normale (ingredienti, procedimento, elenchi) — <span id="scaleBodyValue">100%</span></label>
+        <input type="range" id="scale-body" min="0.85" max="1.4" step="0.05" value="1" style="width:100%;">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <h2>Disposizione</h2>
+      <span class="choice-label">Icona nelle card Colazione/Pranzo/Cena</span>
+      <div class="choice-row" data-group="direction">
+        <button data-value="row" class="active">A fianco</button>
+        <button data-value="column">Sopra il testo</button>
+      </div>
+      <span class="choice-label">Colonne sezione Spuntini</span>
+      <div class="choice-row" data-group="cols">
+        <button data-value="2" class="active">2 colonne</button>
+        <button data-value="1">1 colonna</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <h2>Testi</h2>
+      <div class="simple-field">
+        <label>Titolo del sito (barra in alto)</label>
+        <input type="text" id="f-siteTitle" value="Ricettario">
+      </div>
+      <div class="simple-field">
+        <label>Titolo della home</label>
+        <input type="text" id="f-headline" value="Il tuo ricettario">
+      </div>
+      <div class="simple-field">
+        <label>Sottotitolo della home</label>
+        <input type="text" id="f-eyebrow" value="Cosa cucini oggi?">
+      </div>
+      <div class="simple-field">
+        <label>Nome sezione pasti principali</label>
+        <input type="text" id="f-sectionMain" value="Pasti principali">
+      </div>
+      <div class="simple-field">
+        <label>Nome sezione spuntini</label>
+        <input type="text" id="f-sectionSnack" value="Spuntini">
+      </div>
+      <div class="simple-field">
+        <label>Messaggio quando una categoria è vuota</label>
+        <textarea id="f-emptyState" rows="2">Non ci sono ancora ricette in questa categoria.
+Torneranno presto nuove idee!</textarea>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <h2>Simbolo in alto a destra</h2>
+      <div class="simple-field">
+        <label>Scritta o emoji (sostituisce il pallino)</label>
+        <input type="text" id="f-brandMarkText" placeholder="Es: Dr. Rossi, oppure 🥗">
+      </div>
+      <div class="color-row">
+        <label>Colore della scritta</label>
+        <input type="color" id="c-brandmark" value="#D98F1F">
+        <input type="text" id="t-brandmark" value="#D98F1F">
+      </div>
+      <div class="simple-field">
+        <label>Oppure un'immagine/logo (link pubblico, opzionale)</label>
+        <input type="text" id="f-brandMarkImage" placeholder="Incolla un link a un'immagine">
+      </div>
+      <p class="font-hint">Il colore della scritta è indipendente dal colore accento: puoi cambiarlo senza modificare le icone. Se compili l'immagine, ha la precedenza sulla scritta. Va bene anche un link di Google Drive (come per le foto delle ricette): ricordati di renderlo visibile a "chiunque abbia il link".</p>
+    </div>
+
+    <div class="field-group">
+      <h2>Nomi dei pasti</h2>
+      <div class="simple-field">
+        <label>Colazione</label>
+        <input type="text" id="f-label-Colazione" placeholder="Colazione">
+      </div>
+      <div class="simple-field">
+        <label>Pranzo</label>
+        <input type="text" id="f-label-Pranzo" placeholder="Pranzo">
+      </div>
+      <div class="simple-field">
+        <label>Cena</label>
+        <input type="text" id="f-label-Cena" placeholder="Cena">
+      </div>
+      <div class="simple-field">
+        <label>Spuntino mattina</label>
+        <input type="text" id="f-label-spuntino-mattina" placeholder="Spuntino mattina">
+      </div>
+      <div class="simple-field">
+        <label>Spuntino pomeriggio</label>
+        <input type="text" id="f-label-spuntino-pomeriggio" placeholder="Spuntino pomeriggio">
+      </div>
+      <p class="font-hint">Cambia solo il nome che vedono i pazienti: il collegamento con le ricette nel foglio Google resta invariato, quindi non serve toccare il modulo o le categorie già inserite.</p>
+    </div>
+
+    <div class="field-group">
+      <h2>Icone dei pasti</h2>
+      <div class="simple-field">
+        <label>Colazione</label>
+        <input type="text" id="f-icon-Colazione" placeholder="Lascia vuoto per l'icona di partenza, oppure incolla un'emoji (es: 🍳)">
+      </div>
+      <div class="simple-field">
+        <label>Pranzo</label>
+        <input type="text" id="f-icon-Pranzo" placeholder="Es: 🍽️">
+      </div>
+      <div class="simple-field">
+        <label>Cena</label>
+        <input type="text" id="f-icon-Cena" placeholder="Es: 🌙">
+      </div>
+      <div class="simple-field">
+        <label>Spuntino mattina</label>
+        <input type="text" id="f-icon-spuntino-mattina" placeholder="Es: ☕">
+      </div>
+      <div class="simple-field">
+        <label>Spuntino pomeriggio</label>
+        <input type="text" id="f-icon-spuntino-pomeriggio" placeholder="Es: 🍎">
+      </div>
+      <p class="font-hint">Puoi incollare un'emoji (su Windows: tasto Windows + punto; su Mac: Cmd+Ctrl+Barra spaziatrice), oppure il link a un'immagine (anche di Google Drive, come per le foto ricette — ricordati di renderla visibile a "chiunque abbia il link").</p>
+    </div>
+
+    <div class="field-group">
+      <h2>Icona dell'app (schermata home del telefono)</h2>
+      <div class="simple-field">
+        <label>Carica un'immagine (meglio se quadrata, es. un logo)</label>
+        <input type="file" id="iconFile" accept="image/*">
+      </div>
+      <div style="display:flex; align-items:center; gap:14px; margin: 4px 0 16px 0;">
+        <div style="width:64px;height:64px;border-radius:16px;overflow:hidden;background:#e8e3d3;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+          <canvas id="iconPreviewCanvas" width="64" height="64" style="width:64px;height:64px;"></canvas>
+        </div>
+        <p class="font-hint" style="margin:0;">Anteprima di come apparirà l'icona una volta installata.</p>
+      </div>
+      <button class="download-btn" id="downloadIconsBtn" style="background:#B5432A;" disabled>Genera e scarica le icone</button>
+      <p class="font-hint">Scarica 4 file. Sostituiscili nella cartella <strong>icons/</strong> del progetto, mantenendo esattamente gli stessi nomi (icon-192.png, icon-512.png, icon-512-maskable.png, apple-touch-icon.png), poi ripubblica su Netlify. Chi ha già installato l'app dovrà disinstallarla e reinstallarla per vedere la nuova icona: è una limitazione del telefono, non del sito.</p>
+    </div>
+
+    <button class="download-btn" id="downloadBtn">Scarica theme.css</button>
+    <button class="download-btn" id="downloadContentBtn" style="margin-top:10px; background:#52713D;">Scarica content.json</button>
+    <button class="reset-btn" id="resetBtn">Ripristina aspetto di partenza</button>
+    <div class="save-note">
+      Dopo aver scaricato i file: sostituisci <strong>theme.css</strong> e <strong>content.json</strong> nella cartella del sito con quelli appena scaricati, poi trascina di nuovo l'intera cartella su Netlify (scheda "Deploys") come hai già fatto le volte scorse.
+    </div>
+  </div>
+
+  <div class="preview-wrap">
+    <div class="preview-frame">
+      <header class="topbar">
+        <h1 class="brand" id="p-siteTitle">Ricettario</h1>
+        <span class="brand-mark" id="p-brandMark"></span>
+      </header>
+      <div style="padding:24px 20px;">
+        <p class="eyebrow" id="p-eyebrow">Cosa cucini oggi?</p>
+        <h2 class="headline" id="p-headline">Il tuo ricettario</h2>
+        <h3 class="section-title" id="p-sectionMain">Pasti principali</h3>
+        <div class="category-grid">
+          <button class="card-cat">
+            <span class="icon" id="p-icon-Colazione"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v3M5.6 5.6l2.1 2.1M18.4 5.6l-2.1 2.1M3 13h18M4 13a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+            <span><span class="cat-name" id="p-label-Colazione">Colazione</span><span class="cat-count">3 ricette</span></span>
+          </button>
+          <button class="card-cat">
+            <span class="icon" id="p-icon-Pranzo"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v2M12 19v2M21 12h-2M5 12H3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+            <span><span class="cat-name" id="p-label-Pranzo">Pranzo</span><span class="cat-count">2 ricette</span></span>
+          </button>
+          <button class="card-cat">
+            <span class="icon" id="p-icon-Cena"><svg viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.3 6.3 0 0 0 10.5 10.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+            <span><span class="cat-name" id="p-label-Cena">Cena</span><span class="cat-count">1 ricetta</span></span>
+          </button>
+        </div>
+        <h3 class="section-title" id="p-sectionSnack">Spuntini</h3>
+        <div class="category-grid small">
+          <button class="card-cat">
+            <span class="icon" id="p-icon-spuntino-mattina"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9h11v4a5.5 5.5 0 0 1-5.5 5.5A5.5 5.5 0 0 1 6 13V9Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+            <span><span class="cat-name" id="p-label-spuntino-mattina">Mattina</span><span class="cat-count">1 ricetta</span></span>
+          </button>
+          <button class="card-cat">
+            <span class="icon" id="p-icon-spuntino-pomeriggio"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21c4-2.5 7-6.2 7-10A7 7 0 0 0 12 4a7 7 0 0 0-7 7c0 3.8 3 7.5 7 10Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+            <span><span class="cat-name" id="p-label-spuntino-pomeriggio">Pomeriggio</span><span class="cat-count">0 ricette</span></span>
+          </button>
+        </div>
+
+        <div class="detail-block" style="margin-top:30px;">
+          <h2>Ingredienti</h2>
+          <ul class="ingredient-list">
+            <li class="checked"><span class="ingredient-check"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></span><span class="txt">Farina d'avena</span></li>
+            <li><span class="ingredient-check"></span><span class="txt">Banana</span></li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h2>Procedimento</h2>
+          <ol class="steps-list">
+            <li>Scaldare una padella antiaderente.</li>
+            <li>Versare il composto e cuocere 2 minuti per lato.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const state = {
+  paper: "#F6F1E3", ink: "#2B2E22", honey: "#D98F1F", tomato: "#B5432A", sage: "#52713D",
+  radius: "18px", tilt: "1", direction: "row", cols: "2",
+  fontDisplay: "Fraunces", fontDisplayFallback: "serif",
+  fontBody: "Work Sans", fontBodyFallback: "sans-serif",
+  scaleHeading: "1", scaleBody: "1", brandMarkColor: "#D98F1F"
+};
+const ORIGINAL_STATE = { ...state };
+
+function darken(hex, amount) {
+  const n = hex.replace("#", "");
+  const parts = [0, 2, 4].map(i => Math.round(parseInt(n.substr(i, 2), 16) * (1 - amount)));
+  return "#" + parts.map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0")).join("");
+}
+
+const root = document.documentElement.style;
+const loadedFonts = new Set();
+
+function loadGoogleFont(name) {
+  const clean = name.trim();
+  if (!clean || loadedFonts.has(clean)) return;
+  loadedFonts.add(clean);
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = "https://fonts.googleapis.com/css2?family=" + encodeURIComponent(clean).replace(/%20/g, "+") + ":wght@400;500;600;700&display=swap";
+  document.head.appendChild(link);
+}
+
+function applyState() {
+  root.setProperty("--paper", state.paper);
+  root.setProperty("--ink", state.ink);
+  root.setProperty("--honey", state.honey);
+  root.setProperty("--honey-deep", darken(state.honey, 0.25));
+  root.setProperty("--tomato", state.tomato);
+  root.setProperty("--sage", state.sage);
+  root.setProperty("--radius", state.radius);
+  root.setProperty("--tilt-mult", state.tilt);
+  root.setProperty("--card-direction", state.direction);
+  root.setProperty("--spuntini-cols", state.cols);
+  root.setProperty("--scale-heading", state.scaleHeading);
+  root.setProperty("--scale-body", state.scaleBody);
+  root.setProperty("--brandmark-color", state.brandMarkColor);
+
+  loadGoogleFont(state.fontDisplay);
+  loadGoogleFont(state.fontBody);
+  root.setProperty("--font-display", `"${state.fontDisplay}", ${state.fontDisplayFallback}`);
+  root.setProperty("--font-body", `"${state.fontBody}", ${state.fontBodyFallback}`);
+}
+
+/* Collega ogni coppia colore <-> testo */
+[["paper","paper"], ["ink","ink"], ["honey","honey"], ["tomato","tomato"], ["sage","sage"]].forEach(([key, id]) => {
+  const colorInput = document.getElementById("c-" + id);
+  const textInput = document.getElementById("t-" + id);
+  colorInput.addEventListener("input", () => {
+    textInput.value = colorInput.value;
+    state[key] = colorInput.value;
+    applyState();
+  });
+  textInput.addEventListener("input", () => {
+    if (/^#[0-9a-fA-F]{6}$/.test(textInput.value)) {
+      colorInput.value = textInput.value;
+      state[key] = textInput.value;
+      applyState();
+    }
+  });
+});
+
+document.getElementById("font-display").addEventListener("input", (e) => { state.fontDisplay = e.target.value || "Fraunces"; applyState(); });
+document.getElementById("font-display-fallback").addEventListener("change", (e) => { state.fontDisplayFallback = e.target.value; applyState(); });
+document.getElementById("font-body").addEventListener("input", (e) => { state.fontBody = e.target.value || "Work Sans"; applyState(); });
+document.getElementById("font-body-fallback").addEventListener("change", (e) => { state.fontBodyFallback = e.target.value; applyState(); });
+
+document.getElementById("scale-heading").addEventListener("input", (e) => {
+  state.scaleHeading = e.target.value;
+  document.getElementById("scaleHeadingValue").textContent = Math.round(e.target.value * 100) + "%";
+  applyState();
+});
+document.getElementById("scale-body").addEventListener("input", (e) => {
+  state.scaleBody = e.target.value;
+  document.getElementById("scaleBodyValue").textContent = Math.round(e.target.value * 100) + "%";
+  applyState();
+});
+
+document.getElementById("c-brandmark").addEventListener("input", (e) => {
+  document.getElementById("t-brandmark").value = e.target.value;
+  state.brandMarkColor = e.target.value;
+  applyState();
+});
+document.getElementById("t-brandmark").addEventListener("input", (e) => {
+  if (/^#[0-9a-fA-F]{6}$/.test(e.target.value)) {
+    document.getElementById("c-brandmark").value = e.target.value;
+    state.brandMarkColor = e.target.value;
+    applyState();
+  }
+});
+
+document.querySelectorAll(".choice-row").forEach(group => {
+  const key = group.dataset.group;
+  const stateKey = { radius: "radius", tilt: "tilt", direction: "direction", cols: "cols" }[key];
+  group.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      group.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      state[stateKey] = btn.dataset.value;
+      applyState();
+    });
+  });
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  Object.assign(state, ORIGINAL_STATE);
+  Object.assign(content, JSON.parse(JSON.stringify(ORIGINAL_CONTENT)));
+  syncAllFieldsToState();
+});
+
+/* ---------------- Contenuti: testi, simbolo, icone ---------------- */
+const content = {
+  siteTitle: "Ricettario",
+  headline: "Il tuo ricettario",
+  eyebrow: "Cosa cucini oggi?",
+  sectionMain: "Pasti principali",
+  sectionSnack: "Spuntini",
+  emptyState: document.getElementById("f-emptyState").value,
+  brandMarkText: "",
+  brandMarkImage: "",
+  icons: { "Colazione": "", "Pranzo": "", "Cena": "", "Spuntino mattina": "", "Spuntino pomeriggio": "" },
+  categoryLabels: { "Colazione": "", "Pranzo": "", "Cena": "", "Spuntino mattina": "", "Spuntino pomeriggio": "" }
+};
+const ORIGINAL_CONTENT = JSON.parse(JSON.stringify(content));
+
+const ICON_SLUGS = {
+  "Colazione": "Colazione",
+  "Pranzo": "Pranzo",
+  "Cena": "Cena",
+  "Spuntino mattina": "spuntino-mattina",
+  "Spuntino pomeriggio": "spuntino-pomeriggio"
+};
+
+const defaultIconHTML = {};
+Object.keys(ICON_SLUGS).forEach(cat => {
+  const el = document.getElementById("p-icon-" + ICON_SLUGS[cat]);
+  if (el) defaultIconHTML[cat] = el.innerHTML;
+});
+
+function iconPreviewHTML(value) {
+  const v = value.trim();
+  const looksLikeImage = /^https?:\/\//i.test(v) || /\.(png|jpe?g|webp|svg|gif)(\?.*)?$/i.test(v);
+  if (looksLikeImage) {
+    return `<img src="${v}" alt="" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`;
+  }
+  return `<span style="font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;width:100%;height:100%;">${v}</span>`;
+}
+
+/* Nomi dei pasti: aggiornano solo l'etichetta mostrata, non la chiave interna
+   usata per collegare le ricette. */
+const defaultLabelText = {};
+Object.keys(ICON_SLUGS).forEach(cat => {
+  const el = document.getElementById("p-label-" + ICON_SLUGS[cat]);
+  if (el) defaultLabelText[cat] = el.textContent;
+});
+
+Object.keys(ICON_SLUGS).forEach(cat => {
+  const input = document.getElementById("f-label-" + ICON_SLUGS[cat]);
+  if (!input) return;
+  input.addEventListener("input", () => {
+    content.categoryLabels[cat] = input.value;
+    const el = document.getElementById("p-label-" + ICON_SLUGS[cat]);
+    if (el) el.textContent = input.value.trim() ? input.value : defaultLabelText[cat];
+  });
+});
+
+function bindText(fieldId, contentKey, previewId) {
+  const input = document.getElementById(fieldId);
+  input.addEventListener("input", () => {
+    content[contentKey] = input.value;
+    if (previewId) {
+      const el = document.getElementById(previewId);
+      if (el) el.textContent = input.value || el.textContent;
+    }
+  });
+}
+bindText("f-siteTitle", "siteTitle", "p-siteTitle");
+bindText("f-headline", "headline", "p-headline");
+bindText("f-eyebrow", "eyebrow", "p-eyebrow");
+bindText("f-sectionMain", "sectionMain", "p-sectionMain");
+bindText("f-sectionSnack", "sectionSnack", "p-sectionSnack");
+document.getElementById("f-emptyState").addEventListener("input", (e) => { content.emptyState = e.target.value; });
+
+document.getElementById("f-brandMarkText").addEventListener("input", (e) => {
+  content.brandMarkText = e.target.value;
+  updateBrandMarkPreview();
+});
+document.getElementById("f-brandMarkImage").addEventListener("input", (e) => {
+  content.brandMarkImage = e.target.value;
+  updateBrandMarkPreview();
+});
+function updateBrandMarkPreview() {
+  const mark = document.getElementById("p-brandMark");
+  if (content.brandMarkImage) {
+    mark.style.cssText = "width:24px;height:24px;border-radius:50%;background:#ccc center/cover no-repeat;flex-shrink:0;";
+    mark.style.backgroundImage = `url("${content.brandMarkImage}")`;
+    mark.textContent = "";
+  } else if (content.brandMarkText) {
+    mark.style.cssText = "width:auto;height:auto;border-radius:0;background:none;font-size:13px;font-weight:600;color:var(--brandmark-color);";
+    mark.textContent = content.brandMarkText;
+  } else {
+    mark.style.cssText = "";
+    mark.textContent = "";
+  }
+}
+
+Object.keys(ICON_SLUGS).forEach(cat => {
+  const input = document.getElementById("f-icon-" + ICON_SLUGS[cat]);
+  if (!input) return;
+  input.addEventListener("input", () => {
+    content.icons[cat] = input.value;
+    const el = document.getElementById("p-icon-" + ICON_SLUGS[cat]);
+    el.innerHTML = input.value.trim() ? iconPreviewHTML(input.value) : defaultIconHTML[cat];
+  });
+});
+
+document.getElementById("downloadContentBtn").addEventListener("click", () => {
+  const data = {
+    siteTitle: content.siteTitle,
+    headline: content.headline,
+    eyebrow: content.eyebrow,
+    sectionMain: content.sectionMain,
+    sectionSnack: content.sectionSnack,
+    emptyState: content.emptyState,
+    brandMarkText: content.brandMarkText,
+    brandMarkImage: content.brandMarkImage,
+    icons: content.icons,
+    categoryLabels: content.categoryLabels
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "content.json";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+/* ---------------- Icona dell'app ---------------- */
+let uploadedIconImage = null;
+const iconFileInput = document.getElementById("iconFile");
+const iconPreviewCanvas = document.getElementById("iconPreviewCanvas");
+const downloadIconsBtn = document.getElementById("downloadIconsBtn");
+
+function drawSquareCrop(img, size, canvas, padFraction) {
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, size, size);
+
+  const pad = padFraction ? Math.round(size * padFraction) : 0;
+  if (pad) {
+    ctx.fillStyle = state.ink || "#2B2E22";
+    ctx.fillRect(0, 0, size, size);
+  }
+
+  const targetSize = size - pad * 2;
+  const srcSize = Math.min(img.width, img.height);
+  const sx = (img.width - srcSize) / 2;
+  const sy = (img.height - srcSize) / 2;
+  ctx.drawImage(img, sx, sy, srcSize, srcSize, pad, pad, targetSize, targetSize);
+}
+
+iconFileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      uploadedIconImage = img;
+      drawSquareCrop(img, 64, iconPreviewCanvas, 0);
+      downloadIconsBtn.disabled = false;
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+function downloadCanvasAsPng(canvas, filename) {
+  canvas.toBlob((blob) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, "image/png");
+}
+
+downloadIconsBtn.addEventListener("click", () => {
+  if (!uploadedIconImage) return;
+  const jobs = [
+    { size: 192, name: "icon-192.png", pad: 0 },
+    { size: 512, name: "icon-512.png", pad: 0 },
+    { size: 512, name: "icon-512-maskable.png", pad: 0.18 },
+    { size: 180, name: "apple-touch-icon.png", pad: 0 }
+  ];
+  jobs.forEach((job, i) => {
+    setTimeout(() => {
+      const c = document.createElement("canvas");
+      drawSquareCrop(uploadedIconImage, job.size, c, job.pad);
+      downloadCanvasAsPng(c, job.name);
+    }, i * 350);
+  });
+});
+
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  const css = `/* ============================================================
+   PERSONALIZZAZIONE ASPETTO
+   File generato con personalizza.html — sostituisci il vecchio
+   theme.css nella cartella del sito con questo file, poi ripubblica
+   su Netlify trascinando di nuovo l'intera cartella.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(state.fontDisplay).replace(/%20/g,"+")}:wght@400;500;600;700&family=${encodeURIComponent(state.fontBody).replace(/%20/g,"+")}:wght@400;500;600;700&display=swap');
+
+:root {
+  --paper: ${state.paper};
+  --ink: ${state.ink};
+  --honey: ${state.honey};
+  --honey-deep: ${darken(state.honey, 0.25)};
+  --tomato: ${state.tomato};
+  --sage: ${state.sage};
+  --radius: ${state.radius};
+  --tilt-mult: ${state.tilt};
+  --card-direction: ${state.direction};
+  --spuntini-cols: ${state.cols};
+  --scale-heading: ${state.scaleHeading};
+  --scale-body: ${state.scaleBody};
+  --brandmark-color: ${state.brandMarkColor};
+  --font-display: "${state.fontDisplay}", ${state.fontDisplayFallback};
+  --font-body: "${state.fontBody}", ${state.fontBodyFallback};
+}
+`;
+  const blob = new Blob([css], { type: "text/css" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "theme.css";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+/* ---------------- Sincronizza campi <-> stato ---------------- */
+function syncColorInput(key, hex) {
+  if (!/^#[0-9a-fA-F]{6}$/i.test(hex || "")) return;
+  const c = document.getElementById("c-" + key);
+  const t = document.getElementById("t-" + key);
+  if (c) c.value = hex;
+  if (t) t.value = hex;
+}
+
+function syncChoice(group, value) {
+  const row = document.querySelector(`.choice-row[data-group="${group}"]`);
+  if (!row) return;
+  row.querySelectorAll("button").forEach(b => {
+    b.classList.toggle("active", b.dataset.value === String(value));
+  });
+}
+
+function syncAllFieldsToState() {
+  ["paper", "ink", "honey", "tomato", "sage"].forEach(k => syncColorInput(k, state[k]));
+  document.getElementById("font-display").value = state.fontDisplay;
+  document.getElementById("font-display-fallback").value = state.fontDisplayFallback;
+  document.getElementById("font-body").value = state.fontBody;
+  document.getElementById("font-body-fallback").value = state.fontBodyFallback;
+  syncChoice("radius", state.radius);
+  syncChoice("tilt", state.tilt);
+  syncChoice("direction", state.direction);
+  syncChoice("cols", state.cols);
+
+  document.getElementById("scale-heading").value = state.scaleHeading;
+  document.getElementById("scaleHeadingValue").textContent = Math.round(state.scaleHeading * 100) + "%";
+  document.getElementById("scale-body").value = state.scaleBody;
+  document.getElementById("scaleBodyValue").textContent = Math.round(state.scaleBody * 100) + "%";
+  syncColorInput("brandmark", state.brandMarkColor);
+
+  document.getElementById("f-siteTitle").value = content.siteTitle;
+  document.getElementById("p-siteTitle").textContent = content.siteTitle;
+  document.getElementById("f-headline").value = content.headline;
+  document.getElementById("p-headline").textContent = content.headline;
+  document.getElementById("f-eyebrow").value = content.eyebrow;
+  document.getElementById("p-eyebrow").textContent = content.eyebrow;
+  document.getElementById("f-sectionMain").value = content.sectionMain;
+  document.getElementById("p-sectionMain").textContent = content.sectionMain;
+  document.getElementById("f-sectionSnack").value = content.sectionSnack;
+  document.getElementById("p-sectionSnack").textContent = content.sectionSnack;
+  document.getElementById("f-emptyState").value = content.emptyState;
+  document.getElementById("f-brandMarkText").value = content.brandMarkText;
+  document.getElementById("f-brandMarkImage").value = content.brandMarkImage;
+
+  Object.keys(ICON_SLUGS).forEach(cat => {
+    const val = content.icons[cat] || "";
+    const input = document.getElementById("f-icon-" + ICON_SLUGS[cat]);
+    if (input) input.value = val;
+    const el = document.getElementById("p-icon-" + ICON_SLUGS[cat]);
+    if (el) el.innerHTML = val.trim() ? iconPreviewHTML(val) : defaultIconHTML[cat];
+  });
+
+  Object.keys(ICON_SLUGS).forEach(cat => {
+    const val = (content.categoryLabels && content.categoryLabels[cat]) || "";
+    const input = document.getElementById("f-label-" + ICON_SLUGS[cat]);
+    if (input) input.value = val;
+    const el = document.getElementById("p-label-" + ICON_SLUGS[cat]);
+    if (el) el.textContent = val.trim() ? val : defaultLabelText[cat];
+  });
+
+  updateBrandMarkPreview();
+  applyState();
+}
+
+/* ---------------- Carica le impostazioni attualmente pubblicate ---------------- */
+function parseCssVars(text) {
+  const vars = {};
+  const re = /--([\w-]+)\s*:\s*([^;]+);/g;
+  let m;
+  while ((m = re.exec(text))) vars[m[1]] = m[2].trim();
+  return vars;
+}
+
+function parseFontVar(v) {
+  const m = v.match(/["']([^"']+)["']\s*,\s*([\w-]+)/);
+  if (m) return { name: m[1], fallback: m[2] };
+  return { name: v.trim(), fallback: "sans-serif" };
+}
+
+async function initFromLive() {
+  try {
+    const res = await fetch("theme.css", { cache: "no-store" });
+    if (res.ok) {
+      const vars = parseCssVars(await res.text());
+      if (vars.paper) state.paper = vars.paper;
+      if (vars.ink) state.ink = vars.ink;
+      if (vars.honey) state.honey = vars.honey;
+      if (vars.tomato) state.tomato = vars.tomato;
+      if (vars.sage) state.sage = vars.sage;
+      if (vars.radius) state.radius = vars.radius;
+      if (vars["tilt-mult"]) state.tilt = vars["tilt-mult"];
+      if (vars["card-direction"]) state.direction = vars["card-direction"];
+      if (vars["spuntini-cols"]) state.cols = vars["spuntini-cols"].replace(/[^0-9]/g, "");
+      if (vars["font-display"]) {
+        const f = parseFontVar(vars["font-display"]);
+        state.fontDisplay = f.name; state.fontDisplayFallback = f.fallback;
+      }
+      if (vars["font-body"]) {
+        const f = parseFontVar(vars["font-body"]);
+        state.fontBody = f.name; state.fontBodyFallback = f.fallback;
+      }
+      if (vars["scale-heading"]) state.scaleHeading = vars["scale-heading"];
+      if (vars["scale-body"]) state.scaleBody = vars["scale-body"];
+      if (vars["brandmark-color"] && /^#[0-9a-fA-F]{6}$/.test(vars["brandmark-color"])) {
+        state.brandMarkColor = vars["brandmark-color"];
+      } else if (vars.honey) {
+        state.brandMarkColor = vars.honey;
+      }
+    }
+  } catch (e) { /* nessun theme.css raggiungibile: restano i valori di partenza */ }
+
+  try {
+    const res2 = await fetch("content.json", { cache: "no-store" });
+    if (res2.ok) {
+      const data = await res2.json();
+      if (data.siteTitle !== undefined) content.siteTitle = data.siteTitle;
+      if (data.headline !== undefined) content.headline = data.headline;
+      if (data.eyebrow !== undefined) content.eyebrow = data.eyebrow;
+      if (data.sectionMain !== undefined) content.sectionMain = data.sectionMain;
+      if (data.sectionSnack !== undefined) content.sectionSnack = data.sectionSnack;
+      if (data.emptyState !== undefined) content.emptyState = data.emptyState;
+      if (data.brandMarkText !== undefined) content.brandMarkText = data.brandMarkText;
+      if (data.brandMarkImage !== undefined) content.brandMarkImage = data.brandMarkImage;
+      if (data.icons) Object.assign(content.icons, data.icons);
+      if (data.categoryLabels) Object.assign(content.categoryLabels, data.categoryLabels);
+    }
+  } catch (e) { /* nessun content.json raggiungibile: restano i valori di partenza */ }
+
+  syncAllFieldsToState();
+}
+
+initFromLive();
+</script>
+</body>
+</html>
