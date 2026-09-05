@@ -10,7 +10,7 @@
   --line: rgba(43,46,34,0.14);
   --shadow: 0 10px 24px rgba(43,46,34,0.14);
   --radius: 18px;
-  --card-gap: 14px;
+  --card-gap: 10px;
   --card-direction: row;
   --spuntini-cols: 2;
   --tilt-mult: 1;
@@ -265,8 +265,8 @@ body {
   background: var(--ink);
   color: var(--paper);
   border-radius: var(--radius);
-  padding: 20px;
-  min-height: 96px;
+  padding: 14px;
+  min-height: 76px;
   display: flex;
   flex-direction: var(--card-direction);
   align-items: center;
@@ -280,7 +280,7 @@ body {
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-end;
-  min-height: 118px;
+  min-height: 92px;
 }
 .card-cat:nth-child(1) { --tilt: calc(-0.6deg * var(--tilt-mult)); }
 .card-cat:nth-child(2) { --tilt: calc(0.5deg * var(--tilt-mult)); }
@@ -291,19 +291,19 @@ body {
   outline: none;
 }
 .card-cat .icon {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
   color: var(--honey);
 }
 .card-cat .cat-name {
   font-family: var(--font-display);
-  font-size: calc(19px * var(--scale-heading));
+  font-size: calc(16px * var(--scale-heading));
   font-weight: 600;
   display: block;
 }
 .card-cat .cat-count {
-  font-size: calc(12.5px * var(--scale-body));
+  font-size: calc(11px * var(--scale-body));
   color: rgba(246,241,227,0.65);
   margin-top: 2px;
   display: block;
